@@ -71,27 +71,29 @@ $scheduledFiles = array_merge($todaysFiles, $tomorrowsFiles);
 
 $isScheduled = false;
 $requestedFileDetails = null;
+$category = null;
+$filename = basename($requestUri);
 
-// The request URI will be something like 'category1/some-file.html'
-$parts = explode('/', $requestUri);
-$category = $parts[0];
-$filename = $parts[1];
-
-foreach ($scheduledFiles as $file) {
-    if ($file['html_name'] === $filename && 'category' . $file['category'] === $category) {
-        $isScheduled = true;
-        $requestedFileDetails = $file;
-        break;
-    }
-}
-
-// Also check for images. The URI for an image will be like 'imagenes/some-file.jpg'
-if ($category === 'imagenes') {
+if (strpos($requestUri, 'imagenes/') === 0) {
+    $category = 'imagenes';
     $htmlFilename = pathinfo($filename, PATHINFO_FILENAME) . '.html';
     foreach ($scheduledFiles as $file) {
         if ($file['html_name'] === $htmlFilename) {
             $isScheduled = true;
             break;
+        }
+    }
+} else {
+    // It's a request for an HTML file.
+    $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
+    if ($fileExtension === 'html') {
+        foreach ($scheduledFiles as $file) {
+            if ($file['html_name'] === $filename) {
+                $isScheduled = true;
+                $requestedFileDetails = $file;
+                $category = 'category' . $file['category'];
+                break;
+            }
         }
     }
 }

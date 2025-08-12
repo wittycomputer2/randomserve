@@ -6,5 +6,5 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-l
 
-# Rewrite requests for category1, category2, and imagenes to index.php
-RewriteRule ^(category1|category2|imagenes)/(.*)$ index.php?uri=$1/$2 [L,QSA]
+# Rewrite all requests to index.php
+RewriteRule ^(.*)$ index.php?uri=$1 [L,QSA]
