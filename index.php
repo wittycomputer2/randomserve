@@ -15,9 +15,9 @@ define('DUMMY_IMAGE', 'imagenes/sample.jpg');
 function getScheduledFiles($date) {
     $scheduledFiles = [];
     if (($handle = fopen(SCHEDULE_FILE, "r")) !== FALSE) {
-        $header = fgetcsv($handle); // Skip header row
+        $header = array_map('trim', fgetcsv($handle)); // Trim header fields
         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-            $rowData = array_combine($header, $data);
+            $rowData = array_combine($header, array_map('trim', $data)); // Trim data fields
             if ($rowData['date'] === $date) {
                 $scheduledFiles[] = $rowData;
             }
@@ -51,7 +51,7 @@ function serveNotFound() {
 // --- Main Logic ---
 
 // Get the requested URI from the .htaccess rewrite rule
-$requestUri = isset($_GET['uri']) ? $_GET['uri'] : '';
+$requestUri = isset($_GET['uri']) ? trim($_GET['uri']) : '';
 
 if (empty($requestUri)) {
     // If no URI is passed, it might be a direct access to index.php, which is not intended.
@@ -108,13 +108,14 @@ if (!$isScheduled) {
 $fileExtension = pathinfo($filename, PATHINFO_EXTENSION);
 
 if ($fileExtension === 'html') {
-    $templateContent = file_get_contents(TEMPLATE_FILE);
+    $filePath = $category . '/' . $filename;
 
-    $imageName = pathinfo($filename, PATHINFO_FILENAME) . '.jpg';
-    // The path needs to be relative from the root, as the request is rewritten.
-    $imagePathInHtml = '/imagenes/' . $imageName;
+    if (!file_exists($filePath)) {
+        // If the file doesn't exist in the category folder, serve a 404.
+        serveNotFound();
+    }
 
-    $pageContent = str_replace('src=""', 'src="' . $imagePathInHtml . '"', $templateContent);
+    $pageContent = file_get_contents($filePath);
 
     // Age verification for category2
     if ($category === 'category2' && (!isset($_COOKIE['age_verified']) || $_COOKIE['age_verified'] !== 'true')) {
