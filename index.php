@@ -62,8 +62,12 @@ if (empty($requestUri)) {
 // Get the current date. For testing, we can override this.
 // $today = '2025-08-12';
 $today = date('Y-m-d');
+$tomorrow = date('Y-m-d', strtotime('+1 day'));
 
-$scheduledFiles = getScheduledFiles($today);
+$todaysFiles = getScheduledFiles($today);
+$tomorrowsFiles = getScheduledFiles($tomorrow);
+
+$scheduledFiles = array_merge($todaysFiles, $tomorrowsFiles);
 
 $isScheduled = false;
 $requestedFileDetails = null;
