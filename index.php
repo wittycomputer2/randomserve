@@ -61,13 +61,15 @@ if (empty($requestUri)) {
 
 // Get the current date. For testing, we can override this.
 // $today = '2025-08-12';
+$yesterday = date('Y-m-d', strtotime('-1 day'));
 $today = date('Y-m-d');
 $tomorrow = date('Y-m-d', strtotime('+1 day'));
 
+$yesterdaysFiles = getScheduledFiles($yesterday);
 $todaysFiles = getScheduledFiles($today);
 $tomorrowsFiles = getScheduledFiles($tomorrow);
 
-$scheduledFiles = array_merge($todaysFiles, $tomorrowsFiles);
+$scheduledFiles = array_merge($yesterdaysFiles, $todaysFiles, $tomorrowsFiles);
 
 $isScheduled = false;
 $requestedFileDetails = null;
@@ -130,7 +132,14 @@ if ($fileExtension === 'html') {
         <div id="age-verification-overlay">
             <div id="age-verification-modal">
                 <h2>Age Verification</h2>
-                <p>You must be 18 or older to view this content.</p>
+                <p>By continuing, you confirm the following:</p>
+
+<ul>
+    <li>You are 18 years of age or older,</li>
+    <li>You are not a resident or citizen of any country or U.S. state where access to AI-generated adult content without verified age verification is prohibited, including the EU, UK, or certain U.S. states (e.g., Texas, Louisiana, Utah).</li>
+</ul>
+
+<p>Misrepresentation may violate your local laws and you assume full responsibility for your use. If you are unsure, do not proceed.</p>
                 <div id="age-verification-buttons">
                     <button id="age-verification-yes">Yes, I'm over 18</button>
                     <button id="age-verification-no">I'm under 18</button>
